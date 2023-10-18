@@ -11,28 +11,31 @@ from abc import ABC, abstractmethod
 # only for python 3.12
 from typing import override
 
+
 class Figure(ABC):
-    """ Абстрактный класс фигуры"""
+    """Абстрактный класс фигуры"""
+
     def __init__(self):
         self.name = "Figure"
 
     @abstractmethod
     def square(self):
-        """ Виртуальный метод площади """
+        """Виртуальный метод площади"""
         pass
 
 
 class Rectangle(Figure):
-    """ Класс прямоугольника """
+    """Класс прямоугольника"""
+
     def __init__(self, x=0, y=0):
-        """ Конструктор прямоугольника """
+        """Конструктор прямоугольника"""
         self.name = "Rectangle"
         self.x = x
         self.y = y
 
     @override
     def square(self):
-        """ Площадь прямоугольника"""
+        """Площадь прямоугольника"""
         return self.x * self.y
 
 
@@ -41,31 +44,34 @@ from math import pi
 
 
 class Triangle(Figure):
-    """ Класс прямоугольника """
+    """Класс прямоугольника"""
+
     def __init__(self, x=0, y=0, z=0):
-        """ Конструктор прямоугольника """
+        """Конструктор прямоугольника"""
         self.name = "Triangle"
         self.x = x
         self.y = y
         self.z = z
+
     @override
     def square(self):
-        """ Площадь прямоугольника"""
+        """Площадь прямоугольника"""
         p = 1.0 * (self.x + self.y + self.z) / 2
         return sqrt(p * (p - self.x) * (p - self.y) * (p - self.z))
 
 
 class Circle(Figure):
-    """ Класс круга"""
+    """Класс круга"""
+
     def __init__(self, R=0):
-        """ Конструктор круга"""
+        """Конструктор круга"""
         self.name = "Circle"
         self.R = R
 
     @override
     def square(self):
-        """ Площадь круга """
-        return pi * self.R ** 2
+        """Площадь круга"""
+        return pi * self.R**2
 
 
 if __name__ == "__main__":

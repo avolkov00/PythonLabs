@@ -17,13 +17,12 @@ class Status(Enum):
 
 class Singleton(object):
     def __new__(cls):
-        if not hasattr(cls, 'instance'):
+        if not hasattr(cls, "instance"):
             cls.instance = super(Singleton, cls).__new__(cls)
         return cls.instance
 
     def __init__(cls):
-        cls.f = open('workfile', 'a', encoding="utf-8")
-
+        cls.f = open("workfile", "a", encoding="utf-8")
 
     def log(self, type, message):
         t = time.localtime()
@@ -34,4 +33,6 @@ class Singleton(object):
 
 if __name__ == "__main__":
     s = Singleton()
-    s.log(Status.INFO.name, "hello")  # @todo наверное вид стоит как то по адекватнее передавать ?
+    s.log(
+        Status.INFO.name, "hello"
+    )  # @todo наверное вид стоит как то по адекватнее передавать ?

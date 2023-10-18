@@ -21,9 +21,14 @@ class Singleton(object):
             cls.instance = super(Singleton, cls).__new__(cls)
         return cls.instance
 
+    def __init__(cls):
+        cls.f = open('workfile', 'a', encoding="utf-8")
+
+
     def log(self, type, message):
         t = time.localtime()
         curtime = time.strftime("%H:%M:%S", t)
+        self.f.write(f"[{type}] {curtime}: {message}\n")
         print(f"[{type}] {curtime}: {message}")
 
 

@@ -18,7 +18,6 @@ class TimerDecorator:
         start = time.perf_counter()
         result = self.function(*args, **kwargs)
         runtime = time.perf_counter() - start
-        # print(f"{self.function.__name__} took {runtime:.4f} secs")
         return runtime
 
 
@@ -31,7 +30,6 @@ class HtmlOutputDecorator:
     def __call__(self, *args, **kwargs):
         result = self.function(*args, **kwargs)
         print(f"<html><body>{result:.4f}</body></html>")
-        # return runtime
 
 
 @HtmlOutputDecorator

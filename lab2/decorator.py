@@ -8,33 +8,49 @@ from functools import wraps
 import time
 
 
-class TimerDecorator:
+class BaseDecorator:
     def __init__(self, function):
         self.function = function
-        self.counter = 0
 
-    # @wraps
+    @property
+    def __name__(self):
+        return self.function.__name__
+
+    def log(self,*args, **kwargs):
+        t = time.localtime()
+        curtime = time.strftime("%H:%M:%S", t)
+        print(f"<{curtime}>: function <{self.function.__name__}> called with arguments <{args}{kwargs}>")
+
+class TimerDecorator(BaseDecorator):
     def __call__(self, *args, **kwargs):
         start = time.perf_counter()
         result = self.function(*args, **kwargs)
-        runtime = time.perf_counter() - start
-        return runtime
+        self.runtime = time.perf_counter() - start
+
+        self.log(*args, **kwargs)
+
+        print(f"{self.runtime:.10f}")
+        return result
+    
+    @property
+    def __name__(self):
+        return self.function.__name__
 
 
-class HtmlOutputDecorator:
-    def __init__(self, function):
-        self.function = function
-        self.counter = 0
-
-    # @wraps
+class HtmlOutputDecorator(BaseDecorator):
     def __call__(self, *args, **kwargs):
         result = self.function(*args, **kwargs)
-        print(f"<html><body>{result:.4f}</body></html>")
+
+        self.log(*args, **kwargs)
+
+        print(f"<html><body>{self.function.runtime:.10f}</body></html>")
+
+        return result
 
 
 @HtmlOutputDecorator
 @TimerDecorator
-def func(count):
+def func(count = 1):
     i = 1
     for j in range(1, count):
         i *= j
@@ -42,4 +58,4 @@ def func(count):
 
 
 if __name__ == "__main__":
-    func(99999)
+    func(9999)

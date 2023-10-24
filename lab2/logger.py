@@ -21,11 +21,12 @@ class Singleton(object):
             cls.instance = super(Singleton, cls).__new__(cls)
         return cls.instance
 
+
 class Logger(Singleton):
     def __init__(cls):
         cls.f = open("workfile", "a", encoding="utf-8")
 
-    def log(self, type, message):
+    def __log(self, type, message):
         """Внутренняя функция логирования"""
         t = time.localtime()
         curtime = time.strftime("%H:%M:%S", t)
@@ -35,28 +36,25 @@ class Logger(Singleton):
 
     def debug(self, message):
         """Дебаг"""
-        self.log(Status.DEBUG, message)
+        self.__log(Status.DEBUG, message)
 
     def info(self, message):
         """Информация"""
-        self.log(Status.INFO,message)
+        self.__log(Status.INFO, message)
 
     def warn(self, message):
         """Предупреждение"""
-        self.log(Status.WARN,message)
+        self.__log(Status.WARN, message)
 
     def error(self, message):
         """Ошибка"""
-        self.log(Status.ERROR,message)
+        self.__log(Status.ERROR, message)
 
     def critical(self, message):
         """Критичная ошибка"""
-        self.log(Status.CRITICAL, message)
-
+        self.__log(Status.CRITICAL, message)
 
 
 if __name__ == "__main__":
-    s = Singleton()
-    s.log(
-        Status.INFO, "hello"
-    )
+    s = Logger()
+    s.info("hello")

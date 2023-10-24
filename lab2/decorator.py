@@ -11,16 +11,17 @@ import time
 class BaseDecorator:
     def __init__(self, function):
         self.function = function
-        self.log_list = list()
+        self.__log_list = list()
 
     @property
     def __name__(self):
         return self.function.__name__
 
-    def log(self,*args, **kwargs):
+    def _log(self, *args, **kwargs):
         t = time.localtime()
         curtime = time.strftime("%H:%M:%S", t)
-        self.log_list.append(f"<{curtime}>: function <{self.function.__name__}> called with arguments <{args}{kwargs}>")
+        self.__log_list.append(f"<{curtime}>: function <{self.function.__name__}> called with arguments <{args}{kwargs}>")
+
 
 class TimerDecorator(BaseDecorator):
     def __call__(self, *args, **kwargs):
@@ -28,11 +29,11 @@ class TimerDecorator(BaseDecorator):
         result = self.function(*args, **kwargs)
         self.runtime = time.perf_counter() - start
 
-        self.log(*args, **kwargs)
+        self._log(*args, **kwargs)
 
         print(f"{self.runtime:.10f}")
         return result
-    
+
     @property
     def __name__(self):
         return self.function.__name__
@@ -42,7 +43,7 @@ class HtmlOutputDecorator(BaseDecorator):
     def __call__(self, *args, **kwargs):
         result = self.function(*args, **kwargs)
 
-        self.log(*args, **kwargs)
+        self._log(*args, **kwargs)
 
         print(f"<html><body>{self.function.runtime:.10f}</body></html>")
 
@@ -51,7 +52,7 @@ class HtmlOutputDecorator(BaseDecorator):
 
 @HtmlOutputDecorator
 @TimerDecorator
-def func(count = 1):
+def func(count=1):
     i = 1
     for j in range(1, count):
         i *= j

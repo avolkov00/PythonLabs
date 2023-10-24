@@ -11,6 +11,7 @@ import time
 class BaseDecorator:
     def __init__(self, function):
         self.function = function
+        self.log_list = list()
 
     @property
     def __name__(self):
@@ -19,7 +20,7 @@ class BaseDecorator:
     def log(self,*args, **kwargs):
         t = time.localtime()
         curtime = time.strftime("%H:%M:%S", t)
-        print(f"<{curtime}>: function <{self.function.__name__}> called with arguments <{args}{kwargs}>")
+        self.log_list.append(f"<{curtime}>: function <{self.function.__name__}> called with arguments <{args}{kwargs}>")
 
 class TimerDecorator(BaseDecorator):
     def __call__(self, *args, **kwargs):

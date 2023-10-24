@@ -15,9 +15,11 @@ from typing import override
 class Figure(ABC):
     """Абстрактный класс фигуры"""
 
-    def __init__(self):
-        self.name = "Figure"
+    name = "Figure"
 
+    def __init__(self):
+        pass
+    
     @abstractmethod
     def square(self):
         """Виртуальный метод площади"""
@@ -27,9 +29,10 @@ class Figure(ABC):
 class Rectangle(Figure):
     """Класс прямоугольника"""
 
+    name = "Rectangle"
+
     def __init__(self, x=0, y=0):
         """Конструктор прямоугольника"""
-        self.name = "Rectangle"
         self.x = x
         self.y = y
 
@@ -46,9 +49,10 @@ from math import pi
 class Triangle(Figure):
     """Класс прямоугольника"""
 
+    name = "Triangle"
+
     def __init__(self, x=0, y=0, z=0):
         """Конструктор прямоугольника"""
-        self.name = "Triangle"
         self.x = x
         self.y = y
         self.z = z
@@ -63,9 +67,10 @@ class Triangle(Figure):
 class Circle(Figure):
     """Класс круга"""
 
+    name = "Circle"
+
     def __init__(self, R=0):
         """Конструктор круга"""
-        self.name = "Circle"
         self.R = R
 
     @override

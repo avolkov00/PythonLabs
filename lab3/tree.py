@@ -1,11 +1,11 @@
 class TreeNode:
+    """ Нода дерева"""
+
     def __init__(self, key=None):
+        """Конструктор ноды"""
         self.key = key
         self.left = None
         self.right = None
-
-    def __str__(self):
-        return f"TreeNode({self.key})"
 
     def insert(self, key):
         if self.key is None:
@@ -25,12 +25,18 @@ class TreeNode:
         else:
             raise ValueError(f"Key {key} already exists")
 
+    def __str__(self):
+        """Строковое представление ноды"""
+        return f"TreeNode({self.key})"
+
     def print_hierarchy(self, dir="root", level=0):
+        """Печать всей иерархии ноды"""
         print(f"[{dir}] #{level} = {self.key} | left = {self.left} | right = {self.right}")
         if self.left is not None: self.left.print_hierarchy("left", level + 1)
         if self.right is not None: self.right.print_hierarchy("right", level + 1)
 
     def preorder_print(self, node):
+        """Генератор для прохода по всей ноде"""
         if node is None:
             pass
 
@@ -43,6 +49,7 @@ class TreeNode:
             yield from self.preorder_print(node.right)
 
     def postorder_print(self):
+        """Генератор для прохода по дереву с текущим элементом в качестве корня"""
         if self.key is None:
             pass
 

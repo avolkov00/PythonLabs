@@ -48,15 +48,8 @@ class TreeNode:
         if node.right is not None:
             yield from self.preorder_print(node.right)
 
-    def postorder_print(self):
-        """Генератор для прохода по дереву с текущим элементом в качестве корня"""
-        if self.key is None:
-            pass
-
-        yield from self.preorder_print(self)
-
     def __iter__(self):
-        yield from self.postorder_print()
+        yield from self.preorder_print(self)
 
 
 tree = TreeNode()

@@ -53,13 +53,7 @@ class TreeNode:
         if self.key is None:
             pass
 
-        if self.left is not None:
-            yield from self.preorder_print(self.left)
-
-        yield self.key
-
-        if self.right is not None:
-            yield from self.preorder_print(self.right)
+        yield from self.preorder_print(self)
 
     def __iter__(self):
         yield from self.postorder_print()

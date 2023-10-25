@@ -35,21 +35,21 @@ class TreeNode:
         if self.left is not None: self.left.print_hierarchy("left", level + 1)
         if self.right is not None: self.right.print_hierarchy("right", level + 1)
 
-    def preorder_print(self, node):
+    def tree_traversal(self, node):
         """Генератор для прохода по всей ноде"""
         if node is None:
             pass
 
         if node.left is not None:
-            yield from self.preorder_print(node.left)
+            yield from self.tree_traversal(node.left)
 
         yield node.key
 
         if node.right is not None:
-            yield from self.preorder_print(node.right)
+            yield from self.tree_traversal(node.right)
 
     def __iter__(self):
-        yield from self.preorder_print(self)
+        yield from self.tree_traversal(self)
 
 
 tree = TreeNode()

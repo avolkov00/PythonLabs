@@ -29,12 +29,6 @@ class TreeNode:
         """Строковое представление ноды"""
         return f"TreeNode({self.key})"
 
-    def print_hierarchy(self, dir="root", level=0):
-        """Печать всей иерархии ноды"""
-        print(f"[{dir}] #{level} = {self.key} | left = {self.left} | right = {self.right}")
-        if self.left is not None: self.left.print_hierarchy("left", level + 1)
-        if self.right is not None: self.right.print_hierarchy("right", level + 1)
-
     def tree_traversal(self, node):
         """Генератор для прохода по всей ноде"""
         if node is None:
@@ -59,9 +53,6 @@ tree.insert(4)
 tree.insert(3)
 tree.insert(6)
 tree.insert(5)
-# tree.print_hierarchy()
-# tree.postorder_print()
 
 for i in tree:
     print(i)
-# tree.insert(3) # exception

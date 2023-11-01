@@ -8,6 +8,7 @@ class TreeNode:
         self.right = None
 
     def insert(self, key):
+        """Вставка ноды"""
         if self.key is None:
             self.key = key
             return
@@ -43,6 +44,7 @@ class TreeNode:
             yield from self.tree_traversal(node.right)
 
     def __iter__(self):
+        """Итератор"""
         yield from self.tree_traversal(self)
 
 

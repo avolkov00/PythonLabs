@@ -18,17 +18,40 @@ from aiohttp import web
 import json
 import datetime
 
+dateformat = '%d.%m.%Y'
+
 
 class Lab:
+    """Лабораторная работа"""
+
     def __init__(self, name, date):
         self.__name = name  # Название лабораторной (обязательно, уникальное поле)
-        self.date = date  # Дедлайн (дата в формате день.месяц. год)
+        self.date = datetime.datetime.strptime(date, dateformat)  # Дедлайн (дата в формате день.месяц. год)
         self.description = None  # Описание (опционально)
         self.students = None  # Список студентов, сдавших данную лабораторную работу (опционально)
 
     @property
     def name(self):
+        """Неизменяемое имя"""
         return self.__name
+
+    def get_dict(self):
+        """Получить в виде словаря для отправки по сети"""
+        res = {'name': self.__name, 'date': self.date.strftime(dateformat)}
+        if self.description is not None:
+            res['description'] = self.description
+        if self.students is not None:
+            res['students'] = ','.join(self.students)
+        return res
+
+    def edit_lab(self, new_lab):
+        """Изменить лабораторнуб работу"""
+        if 'date' in new_lab:
+            self.date = datetime.datetime.strptime(new_lab['date'], dateformat)  # Хранить в виде datetime для удобства
+        if 'description' in new_lab:
+            self.description = new_lab['description']
+        if 'students' in new_lab:
+            self.students = new_lab['students'].strip().split(',')  # Хранить в виде списка для удобства
 
 
 class Server:
@@ -39,17 +62,18 @@ class Server:
         self.url = "http://localhost:8080"
         self.labs = dict()
 
+        routes = web.RouteTableDef()
         self.app.router.add_post('/labs', self.add_lab)
         self.app.router.add_get('/labs', self.get_labs)
-        self.app.router.add_get('/labs/{name}', self.get_lab)
-        self.app.router.add_patch('/labs/{name}', self.edit_lab)
-        self.app.router.add_delete('/labs/{name}', self.delete_lab)
+        self.app.router.add_get('/labs/{lab_name}', self.get_lab)
+        self.app.router.add_patch('/labs/{lab_name}', self.edit_lab)
+        self.app.router.add_delete('/labs/{lab_name}', self.delete_lab)
 
-    # @routes.post('/labs') почему-то как метод класса не работает ;(
+    # @routes.post('/labs') # почему-то как метод класса не работает ;(
     async def add_lab(self, request):
         """Добавление лабораторной на сервер"""
         text = await request.text()
-        req = dict()
+
         try:
             req = json.loads(text)
         except Exception as inst:
@@ -69,20 +93,45 @@ class Server:
             return web.Response(status=200, text="{}/{}".format(self.url, req['name']))
 
     async def get_labs(self, request):
-        """Получить список лабораторных"""
-        resp = dict()
-        for i in self.labs.keys():
-            resp[i] = None
+        """Получить все лабораторные"""
+        resp = list()
+        for i in self.labs:
+            resp.append(self.labs[i].get_dict())
         return web.json_response(status=200, data=resp)
 
     async def get_lab(self, request):
-        pass
+        """Получить конкретную лабораторную"""
+        lab_name = request.match_info['lab_name']
+        if lab_name not in self.labs:
+            return web.Response(status=404, text="Лабораборная работа не найдена")
+        else:
+            return web.json_response(status=200, data=self.labs[lab_name].get_dict())
 
     async def edit_lab(self, request):
-        pass
+        """Редактирование лабораторной"""
+        lab_name = request.match_info['lab_name']
+        text = await request.text()
+        if lab_name not in self.labs:
+            return web.Response(status=404, text="Лабораборная работа не найдена")
+        else:
+            try:
+                req = json.loads(text)
+                self.labs[lab_name].edit_lab(req)
+                return web.json_response(status=200)
+            except Exception as inst:
+                print(type(inst))  # the exception type
+                print(inst.args)  # arguments stored in .args
+                print(inst)  # __str__ allows args to be printed directly,
+                return web.Response(status=400, text=str(inst))
 
     async def delete_lab(self, request):
-        pass
+        """Удалить лабораторную"""
+        lab_name = request.match_info['lab_name']
+        if lab_name not in self.labs:
+            return web.Response(status=404, text="Лабораборная работа не найдена")
+        else:
+            del self.labs[lab_name]
+            return web.Response(status=200)
 
 
 if __name__ == '__main__':

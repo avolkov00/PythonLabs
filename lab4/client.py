@@ -6,6 +6,7 @@ import json
 
 class Client:
     """Класс клиента"""
+
     def __init__(self, url):
         self.url = url
 
@@ -27,7 +28,7 @@ class Client:
     async def get_lab(self, text):
         """Получить лабораторную работу"""
         async with aiohttp.ClientSession() as session:
-            async with session.get(url="{}/{}".format(self.url, text)) as response:
+            async with session.get(url="{}/{}/{}".format(self.url, 'labs', text)) as response:
                 await self.print_response(response)
 
     async def get_labs(self):
@@ -47,13 +48,14 @@ class Client:
             if students is not None:
                 request['students'] = students
 
-            async with session.patch(url="{}/{}".format(self.url, lab), test=json.dumps(request)) as response:
+            async with session.patch(url="{}/{}/{}".format(self.url, 'labs', lab),
+                                     data=json.dumps(request)) as response:
                 await self.print_response(response)
 
     async def remove_lab(self, lab):
         """Удалить лабораторную работу"""
         async with aiohttp.ClientSession() as session:
-            async with session.delete(url="{}/{}".format(self.url, lab)) as response:
+            async with session.delete(url="{}/{}/{}".format(self.url, 'labs', lab)) as response:
                 await self.print_response(response)
 
 
@@ -93,7 +95,7 @@ if __name__ == "__main__":
         asyncio.run(client.get_labs())
 
     if args.get:
-        asyncio.run(client.get_lab(args.lab))
+        asyncio.run(client.get_lab(args.get))
 
     if args.add and not args.date:
         print("Для добавления лабораторной работы требуется дедлайн(--date)")
@@ -106,4 +108,4 @@ if __name__ == "__main__":
         asyncio.run(client.edit_lab(args.edit, args.date, args.description, args.students))
 
     if args.remove:
-        asyncio.run(client.remove_lab(args.lab))
+        asyncio.run(client.remove_lab(args.remove))

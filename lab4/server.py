@@ -35,6 +35,17 @@ class Lab:
         """Неизменяемое имя"""
         return self.__name
 
+    @staticmethod
+    def check_date_format(date):
+        """Проверить формат даты"""
+        try:
+            datetime.datetime.strptime(date, dateformat)  # Дедлайн (дата в формате день.месяц. год)
+            return True
+        except Exception as inst:
+            print(type(inst))  # the exception type
+            print(inst)  # __str__ allows args to be printed directly,
+            return False
+
     def get_dict(self):
         """Получить в виде словаря для отправки по сети"""
         res = {'name': self.__name, 'date': self.date.strftime(dateformat)}
@@ -46,7 +57,7 @@ class Lab:
 
     def edit_lab(self, new_lab):
         """Изменить лабораторнуб работу"""
-        if 'date' in new_lab:
+        if 'date' in new_lab: #todo проверка формата дата
             self.date = datetime.datetime.strptime(new_lab['date'], dateformat)  # Хранить в виде datetime для удобства
         if 'description' in new_lab:
             self.description = new_lab['description']
@@ -72,10 +83,8 @@ class Server:
     # @routes.post('/labs') # почему-то как метод класса не работает ;(
     async def add_lab(self, request):
         """Добавление лабораторной на сервер"""
-        text = await request.text()
-
         try:
-            req = json.loads(text)
+            req = await request.json()
         except Exception as inst:
             print(type(inst))  # the exception type
             print(inst.args)  # arguments stored in .args
@@ -88,50 +97,56 @@ class Server:
         if req['name'] in self.labs:
             # лабораторная уже существует
             return web.Response(status=409, text="Лабораторная уже существует")
-        else:
-            self.labs[req['name']] = Lab(name=req['name'], date=req['date'])
-            return web.Response(status=200, text="{}/{}".format(self.url, req['name']))
+
+        if not Lab.check_date_format(req['date']):
+            # неправильный формат даты
+            return web.Response(status=400, text="Некорректный формат даты")
+
+        self.labs[req['name']] = Lab(name=req['name'], date=req['date'])
+        return web.Response(status=200, text="{}/{}".format(self.url, req['name']))
 
     async def get_labs(self, request):
         """Получить все лабораторные"""
-        resp = list()
+        resp = dict()
         for i in self.labs:
-            resp.append(self.labs[i].get_dict())
+            resp[i] = self.labs[i].get_dict()
         return web.json_response(status=200, data=resp)
 
     async def get_lab(self, request):
         """Получить конкретную лабораторную"""
         lab_name = request.match_info['lab_name']
         if lab_name not in self.labs:
-            return web.Response(status=404, text="Лабораборная работа не найдена")
+            return web.Response(status=404, text="Лабораторная работа не найдена")
         else:
             return web.json_response(status=200, data=self.labs[lab_name].get_dict())
 
     async def edit_lab(self, request):
         """Редактирование лабораторной"""
         lab_name = request.match_info['lab_name']
-        text = await request.text()
         if lab_name not in self.labs:
-            return web.Response(status=404, text="Лабораборная работа не найдена")
-        else:
-            try:
-                req = json.loads(text)
-                self.labs[lab_name].edit_lab(req)
-                return web.json_response(status=200)
-            except Exception as inst:
-                print(type(inst))  # the exception type
-                print(inst.args)  # arguments stored in .args
-                print(inst)  # __str__ allows args to be printed directly,
-                return web.Response(status=400, text=str(inst))
+            return web.Response(status=404, text="Лабораторная работа не найдена")
+        try:
+            req = await request.json()
+
+            if ('date' in req) and not (Lab.check_date_format(req['date'])):
+                return web.Response(status=400, text="Неверный формат даты")
+
+            self.labs[lab_name].edit_lab(req)
+            return web.json_response(status=200, text="Лабораторная изменена")
+        except Exception as inst:
+            print(type(inst))  # the exception type
+            print(inst.args)  # arguments stored in .args
+            print(inst)  # __str__ allows args to be printed directly,
+            return web.Response(status=400, text=str(inst))
 
     async def delete_lab(self, request):
         """Удалить лабораторную"""
         lab_name = request.match_info['lab_name']
         if lab_name not in self.labs:
-            return web.Response(status=404, text="Лабораборная работа не найдена")
+            return web.Response(status=404, text="Лабораторная работа не найдена")
         else:
             del self.labs[lab_name]
-            return web.Response(status=200)
+            return web.Response(status=200, text="Лабораторная удалена")
 
 
 if __name__ == '__main__':

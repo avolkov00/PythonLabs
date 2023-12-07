@@ -18,6 +18,7 @@ class Client:
         text = await response.text()
         if not len(text) == 0:
             print(text)
+            print(response.headers)
 
     @staticmethod
     async def export_labs(res, name):

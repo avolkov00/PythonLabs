@@ -17,6 +17,7 @@
 from aiohttp import web
 import json
 import datetime
+import multidict
 
 dateformat = '%d.%m.%Y'
 
@@ -57,7 +58,7 @@ class Lab:
 
     def edit_lab(self, new_lab):
         """Изменить лабораторнуб работу"""
-        if 'date' in new_lab: #todo проверка формата дата
+        if 'date' in new_lab:  # todo проверка формата дата
             self.date = datetime.datetime.strptime(new_lab['date'], dateformat)  # Хранить в виде datetime для удобства
         if 'description' in new_lab:
             self.description = new_lab['description']
@@ -103,7 +104,8 @@ class Server:
             return web.Response(status=400, text="Некорректный формат даты")
 
         self.labs[req['name']] = Lab(name=req['name'], date=req['date'])
-        return web.Response(status=200, text="{}/{}".format(self.url, req['name']))
+        return web.Response(status=201,
+                            headers=multidict.MultiDict({'Location': "{}/{}".format(self.url, req['name'])}))
 
     async def get_labs(self, request):
         """Получить все лабораторные"""
